@@ -16,9 +16,14 @@ var config = {
         }
     }
 };
-var game = new Phaser.Game(config);
+let game = new Phaser.Game(config);
 let platform;
+let star;
 let info;
+let delta = 1000;
+let lastStarTime = 0;
+let starsCaught = 0;
+let starsFallen = 0;
 function preload () {
     this.load.image("star", "/assets/images/star.png");
     this.load.image("platform", "/assets/images/platform.png");
@@ -34,6 +39,26 @@ function create () {
     info = this.add.text(10, 10, 'hello',
         { font: '24px Arial Bold', fill: '#FBFBAC' });
 }
-function update() {
-    
+function update(time) {
+    let diff = time-lastStarTime;
+    if (diff > delta) {
+        lastStarTime = time;
+        if (delta > 500) {
+            delta -= 20;
+        }
+        emitStar();
+    }
+    info.text =
+    starsCaught + " caught - " +
+    starsFallen + " fallen (max 3)";
 }
+function emitStar () {
+    star = this.physics.add.image(Phaser.Math.Between(25, 775), 26, "star");
+    star.setDisplaySize(50, 50);
+    star.setVelocity(0, 200);
+    star.setInteractive();
+    star.on('pointerdown', this.onClick(star), this);
+    this.physics.add.collider(star, this.sand,
+    onFall(star), null, this);
+}
+ 
