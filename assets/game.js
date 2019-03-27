@@ -45,7 +45,7 @@
                 star.setDisplaySize(50, 50);
                 star.setVelocity(0, 200);
                 star.setInteractive();
-                star.on('pointerdown', this.onClick);
+                star.on('pointerdown', this.onClick(star));
             this.physics.add.collider(star, platform, this.onFall(star), null, this);
         },
         onFall: function (star) {
@@ -59,16 +59,43 @@
             
         },
         onClick : function (star) {
-            console.log(star);
+            return function () {
+                star.setTint(0x00ff00);
+                star.setVelocity(0, 0);
+                starsCaught += 1;
+                this.time.delayedCall(100, function (star) {
+                    star.destroy();
+                }, [star], this);
+            }
         } 
     });
 
+    // welcome scene
+    // let title;
+    // let hint;
+    let welcomeScene = new Phaser.Scene ({
+        Extends: Phaser.Scene,
+        initialize:
+            function welcomeScene() {
+                Phaser.Scene.call(this, { key: "welcomeScene" });
+            },
+            create : function () {
+               this.add.text(150, 200, 'StarFall',
+                    { font: '128px Arial Bold', fill: '#FBFBAC' });
+               this.add.text(300, 350, 'Click to start',
+                    { font: '24px Arial Bold', fill: '#FBFBAC' });
+                hint.on('pointerdown', function (/*pointer*/) {
+                    this.scene.start("GameScene");
+                }, this)
+            }
+
+    })
     new Phaser.Game({
         title: "Starfall",
         width: 800,
         height: 600,
         backgroundColor: "#18216D",
-        scene: [mainScene],
+        scene: [welcomeScene,mainScene],
         physics: {
             default: "arcade",
             arcade: {
