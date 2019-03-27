@@ -24,7 +24,7 @@
             Phaser.Actions.PlaceOnLine(platform.getChildren(), new Phaser.Geom.Line(20, 580, 820, 580));
             // We also have to call refresh() to update the group bounding box (otherwise, the collisions will be checked against the default location, which is the top left corner of the scene).
             platform.refresh();
-            info = this.add.text(10, 10, 'hello',
+            info = this.add.text(10, 10, '',
                 { font: '24px Arial Bold', fill: '#FBFBAC' });
         },
         update: function (time) {
@@ -45,16 +45,21 @@
                 star.setDisplaySize(50, 50);
                 star.setVelocity(0, 200);
                 star.setInteractive();
-                // star.on('pointerdown', onClick(star), this);
-                // this.physics.add.collider(star, platform,
-                //     this.onFall(star), null, this);
+                star.on('pointerdown', this.onClick);
+            this.physics.add.collider(star, platform, this.onFall(star), null, this);
         },
         onFall: function (star) {
-            star.setTint(0xff0000);
-            starsFallen += 1;
-            this.time.delayedCall(100, function (star) {
-                star.destroy();
-            }, [star], this);
+            return function (){
+                star.setTint(0xff0000);
+                starsFallen += 1;
+                this.time.delayedCall(500, function (star) {
+                    star.destroy();
+                }, [star], this);
+            }
+            
+        },
+        onClick : function (star) {
+            console.log(star);
         } 
     });
 
