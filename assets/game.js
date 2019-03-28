@@ -28,6 +28,8 @@
                 { font: '24px Arial Bold', fill: '#FBFBAC' });
         },
         update: function (time) {
+            console.log(delta);
+            console.log(time);
             let diff = time - lastStarTime;
             if (diff > delta) {
                 lastStarTime = time;
@@ -103,12 +105,10 @@
                 function gaemOverScene() {
                     Phaser.Scene.call(this,{key:"gameOverScene"});
                 },
-        init : function () {
-            
-        },
         create : function (score) {
             console.log(score);
             starsCaught = 0;
+            starsFallen = 0;
             const resultText = 'Your score is ' + score.starsCaught + '!';
              this.add.text(200, 250, resultText,
                 { font: '48px Arial Bold', fill: '#FBFBAC' });
