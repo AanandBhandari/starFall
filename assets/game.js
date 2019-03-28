@@ -45,7 +45,7 @@
                 star.setDisplaySize(50, 50);
                 star.setVelocity(0, 200);
                 star.setInteractive();
-                star.on('pointerdown', this.onClick(star));
+                star.on('pointerdown', this.onClick(star),this);
             this.physics.add.collider(star, platform, this.onFall(star), null, this);
         },
         onFall: function (star) {
@@ -54,11 +54,16 @@
                 starsFallen += 1;
                 this.time.delayedCall(500, function (star) {
                     star.destroy();
+                    if (starsFallen > 2) {
+                        this.scene.start("gameOverScene",
+                            { starsCaught: starsCaught });
+                    }
                 }, [star], this);
             }
             
         },
         onClick : function (star) {
+            // var _this = this;
             return function () {
                 star.setTint(0x00ff00);
                 star.setVelocity(0, 0);
@@ -67,13 +72,14 @@
                     star.destroy();
                 }, [star], this);
             }
+            
         } 
     });
 
     // welcome scene
-    // let title;
-    // let hint;
-    let welcomeScene = new Phaser.Scene ({
+    //  let title;
+    //  var hint;
+    let welcomeScene = new Phaser.Class ({
         Extends: Phaser.Scene,
         initialize:
             function welcomeScene() {
@@ -84,18 +90,41 @@
                     { font: '128px Arial Bold', fill: '#FBFBAC' });
                this.add.text(300, 350, 'Click to start',
                     { font: '24px Arial Bold', fill: '#FBFBAC' });
-                hint.on('pointerdown', function (/*pointer*/) {
-                    this.scene.start("GameScene");
+                    // var _this = this;
+                this.input.on('pointerdown', function (pointer) {
+                    this.scene.start("mainScene");
                 }, this)
             }
 
+    })
+    let gameOverScene = new Phaser.Class ( {
+        Extends : Phaser.Scene,
+        initialize :
+                function gaemOverScene() {
+                    Phaser.Scene.call(this,{key:"gameOverScene"});
+                },
+        init : function () {
+            
+        },
+        create : function (score) {
+            console.log(score);
+            starsCaught = 0;
+            const resultText = 'Your score is ' + score.starsCaught + '!';
+             this.add.text(200, 250, resultText,
+                { font: '48px Arial Bold', fill: '#FBFBAC' });
+             this.add.text(300, 350, 'Click to Restart',
+                { font: '24px Arial Bold', fill: '#FBFBAC' });
+            this.input.on('pointerdown', function (pointer) {
+                this.scene.start("welcomeScene");
+            }, this)
+        }
     })
     new Phaser.Game({
         title: "Starfall",
         width: 800,
         height: 600,
         backgroundColor: "#18216D",
-        scene: [welcomeScene,mainScene],
+        scene: [welcomeScene,mainScene,gameOverScene],
         physics: {
             default: "arcade",
             arcade: {
